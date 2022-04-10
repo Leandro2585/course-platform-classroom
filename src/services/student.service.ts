@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
 
+type CreateStudentInput = {
+  user_id: string;
+};
+
 @Injectable()
 export class StudentService {
   constructor(private prisma: PrismaService) {}
@@ -15,5 +19,9 @@ export class StudentService {
 
   async findById(id: string) {
     return await this.prisma.tb_student.findUnique({ where: { id } });
+  }
+
+  async create({ user_id }: CreateStudentInput) {
+    return await this.prisma.tb_student.create({ data: { user_id } });
   }
 }

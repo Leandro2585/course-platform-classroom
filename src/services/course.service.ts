@@ -4,6 +4,7 @@ import slugify from 'slugify';
 
 type CreateCourseInput = {
   title: string;
+  slug?: string;
 };
 
 @Injectable()
@@ -18,12 +19,20 @@ export class CourseService {
     return await this.prisma.tb_course.findUnique({ where: { id } });
   }
 
-  async create({ title }: CreateCourseInput) {
-    const slug = slugify(title, { lower: true });
+  async findCourseBySlug({ slug }: { slug: string }) {
+    return await this.prisma.tb_course.findUnique({ where: { slug } });
+  }
+
+  async create({
+    title,
+    slug = slugify(title, { lower: true }),
+  }: CreateCourseInput) {
     const courseAlreadyExists = await this.prisma.tb_course.findUnique({
       where: { slug },
     });
     if (courseAlreadyExists) throw new Error('Course already exists');
-    return await this.prisma.tb_course.create({ data: { title, slug } });
+    return await this.prisma.tb_course.create({
+      data: { title, slug },
+    });
   }
 }
